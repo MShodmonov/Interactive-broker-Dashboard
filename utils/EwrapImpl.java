@@ -77,8 +77,8 @@ public class EwrapImpl implements EWrapper {
         }
     }
 
-    public void cronJob() {
-        onHistoricalData2(currentContract);
+    public void cronJob(HistoryEnum historyEnum) {
+        onHistoricalData2(currentContract, historyEnum);
 
     }
 
@@ -192,7 +192,7 @@ public class EwrapImpl implements EWrapper {
                 m_orderDlg.useRTH(), m_orderDlg.formatDate());
     }
 
-    private void onHistoricalData2(ContractDetails contractDetails) {
+    private void onHistoricalData2(ContractDetails contractDetails, HistoryEnum historyEnum) {
 
 
         // run m_orderDlg
@@ -207,27 +207,34 @@ public class EwrapImpl implements EWrapper {
         String dateString = date.format(format);
         dateString = LocalDateTime.from(format.parse(dateString)).minusHours(1).format(format);
         dateString = dateString + " " + contractDetails.timeZoneId();
+        switch (historyEnum){
+            case MIN -> m_client.reqHistoricalData(counterMin.get(), contractDetails.contract(),
+                    dateString, "7200 S",
+                    "1 min", "TRADES",
+                    1, 1, false, null);
+            case MIN5 ->  m_client.reqHistoricalData(counterMin5.get(), contractDetails.contract(),
+                    dateString, "36000 S",
+                    "5 mins", "TRADES",
+                    1, 1, false, null);
+            case HOURLY -> m_client.reqHistoricalData(counterHourly.get(), contractDetails.contract(),
+                    dateString, "3 D",
+                    "1 hour", "TRADES",
+                    1, 1, false, null);
+            case DAILY -> m_client.reqHistoricalData(counterDaily.get(), contractDetails.contract(),
+                    dateString, "2 M",
+                    "1 day", "TRADES",
+                    1, 1, false, null);
+
+        }
 
         // req historical data
-        m_client.reqHistoricalData(counterMin.get(), contractDetails.contract(),
-                dateString, "7200 S",
-                "1 min", "TRADES",
-                1, 1, false, null);
 
-        m_client.reqHistoricalData(counterMin5.get(), contractDetails.contract(),
-                dateString, "36000 S",
-                "5 mins", "TRADES",
-                1, 1, false, null);
 
-        m_client.reqHistoricalData(counterHourly.get(), contractDetails.contract(),
-                dateString, "3 D",
-                "1 hour", "TRADES",
-                1, 1, false, null);
 
-        m_client.reqHistoricalData(counterDaily.get(), contractDetails.contract(),
-                dateString, "2 M",
-                "1 day", "TRADES",
-                1, 1, false, null);
+
+
+
+
 
     }
 
@@ -325,7 +332,10 @@ public class EwrapImpl implements EWrapper {
             }
         });
         onHeadTimestamp(currentContract.contract());
-        onHistoricalData2(currentContract);
+        onHistoricalData2(currentContract, HistoryEnum.MIN);
+        onHistoricalData2(currentContract, HistoryEnum.MIN5);
+        onHistoricalData2(currentContract, HistoryEnum.HOURLY);
+        onHistoricalData2(currentContract, HistoryEnum.DAILY);
     }
 
     public void historicalData(int reqId, Bar bar) {
@@ -542,9 +552,10 @@ public class EwrapImpl implements EWrapper {
         onCancelHistoricalData(reqId);
 
         if (minChart != null && min5Chart != null && hourlyChart != null && dailyChart != null) {
-            if ((minList.getReqId() + 1) == counterMin.get() && (min5List.getReqId() + 1) == counterMin5.get() && (hourlyList.getReqId() + 1) == counterHourly.get() && (dailyList.getReqId() + 1) == counterDaily.get()) {
+            if (mainFrame == null)
                 mainFrame = new MainFrame(minChart, min5Chart, hourlyChart, dailyChart);
-            }
+            } else {
+
         }
     }
 

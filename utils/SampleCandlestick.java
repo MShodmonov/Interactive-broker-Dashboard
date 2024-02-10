@@ -41,6 +41,7 @@ public class SampleCandlestick {
     public SampleCandlestick(final String title, List<Bar> barList) {
         drawCandleSticks(barList);
         final JFreeChart chart = createChart(dataset);
+        chart.setTitle(title);
         chart.getXYPlot().setOrientation(PlotOrientation.VERTICAL);
         XYPlot plot = chart.getXYPlot();
         ValueAxis rangeAxis = plot.getRangeAxis();

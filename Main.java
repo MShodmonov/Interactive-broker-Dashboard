@@ -4,9 +4,11 @@
 package TestJavaClient;
 
 import TestJavaClient.utils.EwrapImpl;
-import TestJavaClient.utils.MyTask;
-import TestJavaClient.utils.SampleCandlestick;
-import org.jfree.ui.RefineryUtilities;
+import TestJavaClient.utils.HistoryEnum;
+import TestJavaClient.utils.Tasks.HistoryDailyTask;
+import TestJavaClient.utils.Tasks.HistoryHourlyTask;
+import TestJavaClient.utils.Tasks.HistoryMin5Task;
+import TestJavaClient.utils.Tasks.HistoryMinTask;
 
 import java.awt.Component;
 import java.util.Timer;
@@ -18,9 +20,15 @@ public class Main {
     // This method is called to start the application
     public static void main (String args[]) {
         Timer t = new Timer();
-        EwrapImpl startingPoint = new EwrapImpl();
-        MyTask task = new MyTask(startingPoint);
-        t.scheduleAtFixedRate(task, 60000, 60000);
+        EwrapImpl apiService = new EwrapImpl();
+        HistoryMinTask minTask = new HistoryMinTask(apiService);
+        HistoryMin5Task min5Task = new HistoryMin5Task(apiService);
+        HistoryHourlyTask hourlyTask = new HistoryHourlyTask(apiService);
+        HistoryDailyTask dailyTask = new HistoryDailyTask(apiService);
+//        t.scheduleAtFixedRate(minTask, 60_000, 60_000);
+//        t.scheduleAtFixedRate(min5Task, 300_000, 300_000);
+//        t.scheduleAtFixedRate(hourlyTask, 3600_000, 3600_000);
+//        t.scheduleAtFixedRate(dailyTask, 86400_000, 86400_000);
 
 //        SampleFrame sampleFrame = new SampleFrame();
 
