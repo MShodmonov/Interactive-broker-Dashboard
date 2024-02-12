@@ -40,6 +40,7 @@ public class SampleCandlestick {
 
     AtomicReference<Double> max = new AtomicReference<>(0D);
     AtomicReference<Double> min = new AtomicReference<>(10000D);
+    AtomicReference<Double> average = new AtomicReference<>(0D);
 
     SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
@@ -56,9 +57,9 @@ public class SampleCandlestick {
         XYPlot plot = chart.getXYPlot();
         ValueAxis rangeAxis = plot.getRangeAxis();
         rangeAxis.setAutoRange(false);
-        if (historyEnum.equals(HistoryEnum.MIN) || historyEnum.equals(HistoryEnum.MIN5)) {
-            rangeAxis.setRange(min.get(), min.get() + (max.get() - min.get()) / 30);
-        } else
+//        if (historyEnum.equals(HistoryEnum.MIN) || historyEnum.equals(HistoryEnum.MIN5)) {
+//            rangeAxis.setRange(min.get(), min.get() + (max.get() - min.get()) / 30);
+//        } else
             rangeAxis.setRange(min.get(), max.get());
         ValueAxis domainAxis = plot.getDomainAxis();
         if (historyEnum.equals(HistoryEnum.MIN) || historyEnum.equals(HistoryEnum.MIN5) || historyEnum.equals(HistoryEnum.HOURLY)) {
@@ -104,6 +105,7 @@ public class SampleCandlestick {
                     if (bar.high() > max.get()) {
                         max.set(bar.high());
                     }
+                    average.set(average.get() + bar.high());
                     if (bar.high() < min.get()) {
                         min.set(bar.high());
                     }
@@ -138,5 +140,6 @@ public class SampleCandlestick {
                 }).toArray(),
                 barList.stream().mapToDouble(bar -> bar.volume().value().doubleValue()).toArray()
         );
+        average.set(average.get()/barList.size());
     }
 }

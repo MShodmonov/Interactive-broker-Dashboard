@@ -537,7 +537,7 @@ public class EwrapImpl implements EWrapper {
         String msg = EWrapperMsgGenerator.historicalDataEnd(reqId, startDate, endDate);
         System.out.println(msg);
         if (reqId == counterMin.get()) {
-            minList.getAverageMoving();
+//            minList.getAverageMoving();
             if (mainFrame == null) {
                 mainFrame = new MainFrame(new SampleCandlestick("1 Min Data Chart", minList.getBarList(), HistoryEnum.MIN));
             }else {
@@ -545,7 +545,7 @@ public class EwrapImpl implements EWrapper {
             }
             counterMin.incrementAndGet();
         } else if (reqId == counterMin5.get()) {
-            min5List.getAverageMoving();
+//            min5List.getAverageMoving();
             mainFrame.setMin5Chart(new SampleCandlestick("5 Min Data Chart", min5List.getBarList(), HistoryEnum.MIN5));
             counterMin5.incrementAndGet();
         } else if (reqId == counterHourly.get()) {
