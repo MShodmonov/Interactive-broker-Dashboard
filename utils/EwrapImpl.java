@@ -537,26 +537,25 @@ public class EwrapImpl implements EWrapper {
         String msg = EWrapperMsgGenerator.historicalDataEnd(reqId, startDate, endDate);
         System.out.println(msg);
         if (reqId == counterMin.get()) {
-            minChart = new SampleCandlestick("1 Min Data Chart", minList.getBarList());
+            minList.getAverageMoving();
+            if (mainFrame == null) {
+                mainFrame = new MainFrame(new SampleCandlestick("1 Min Data Chart", minList.getBarList(), HistoryEnum.MIN));
+            }else {
+                mainFrame.setMinChart(new SampleCandlestick("1 Min Data Chart", minList.getBarList(), HistoryEnum.MIN));
+            }
             counterMin.incrementAndGet();
         } else if (reqId == counterMin5.get()) {
-            min5Chart = new SampleCandlestick("5 Min Data Chart", min5List.getBarList());
+            min5List.getAverageMoving();
+            mainFrame.setMin5Chart(new SampleCandlestick("5 Min Data Chart", min5List.getBarList(), HistoryEnum.MIN5));
             counterMin5.incrementAndGet();
         } else if (reqId == counterHourly.get()) {
-            hourlyChart = new SampleCandlestick("1 Hour Data Chart", hourlyList.getBarList());
+            mainFrame.setHourlyChart(new SampleCandlestick("1 Hour Data Chart", hourlyList.getBarList(), HistoryEnum.HOURLY));
             counterHourly.incrementAndGet();
         } else if (reqId == counterDaily.get()) {
-            dailyChart = new SampleCandlestick("1 Day Data Chart", dailyList.getBarList());
+            mainFrame.setDailyChart(new SampleCandlestick("1 Day Data Chart", dailyList.getBarList(), HistoryEnum.DAILY));
             counterDaily.incrementAndGet();
         }
         onCancelHistoricalData(reqId);
-
-        if (minChart != null && min5Chart != null && hourlyChart != null && dailyChart != null) {
-            if (mainFrame == null)
-                mainFrame = new MainFrame(minChart, min5Chart, hourlyChart, dailyChart);
-            } else {
-
-        }
     }
 
     @Override

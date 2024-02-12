@@ -1,15 +1,7 @@
 package TestJavaClient.utils;
 
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuKeyEvent;
-import javax.swing.event.MenuKeyListener;
-import javax.swing.event.MenuListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 public class MainFrame extends JFrame {
 
@@ -23,11 +15,13 @@ public class MainFrame extends JFrame {
 
     private JMenu menuList = null;
 
-    public MainFrame(SampleCandlestick minChart, SampleCandlestick min5Chart, SampleCandlestick hourlyChart, SampleCandlestick dailyChart) {
+    private JPanel panel;
+
+    private HistoryEnum currentEnum;
+
+    public MainFrame(SampleCandlestick minChart) {
         this.minChart = minChart;
-        this.min5Chart = min5Chart;
-        this.hourlyChart = hourlyChart;
-        this.dailyChart = dailyChart;
+        setSize(new Dimension(1920, 1080));
 
         JMenuBar menu = new JMenuBar();
         menuList = new JMenu("Historical Data");
@@ -44,19 +38,17 @@ public class MainFrame extends JFrame {
         menu.add(menuList);
         setJMenuBar(menu);
 
-        JPanel panel = new JPanel(new GridLayout(2, 2));
-//        getJMenuBar().add()
+        panel = new JPanel(new GridLayout(2, 2));
         getContentPane().add(panel);
-        JButton someButton = new JButton("Connect");
-        someButton.setPreferredSize(new Dimension(20, 100));
-        menuOptionChooseAction(panel, HistoryEnum.MIN);
-//        butConnect.addActionListener(e -> onConnect());
+        panel.add(minChart.chartPanel);
+//        JButton someButton = new JButton("Connect");
+//        someButton.setPreferredSize(new Dimension(20, 100));
 
-        minItem.addActionListener(e -> menuOptionChooseAction(panel, HistoryEnum.valueOf(e.getActionCommand())));
-        min5Item.addActionListener(e -> menuOptionChooseAction(panel, HistoryEnum.valueOf(e.getActionCommand())));
-        hourlyItem.addActionListener(e -> menuOptionChooseAction(panel, HistoryEnum.valueOf(e.getActionCommand())));
-        dailyItem.addActionListener(e -> menuOptionChooseAction(panel, HistoryEnum.valueOf(e.getActionCommand())));
-        panel.add(someButton);
+        minItem.addActionListener(e -> menuOptionChooseAction(HistoryEnum.valueOf(e.getActionCommand())));
+        min5Item.addActionListener(e -> menuOptionChooseAction(HistoryEnum.valueOf(e.getActionCommand())));
+        hourlyItem.addActionListener(e -> menuOptionChooseAction(HistoryEnum.valueOf(e.getActionCommand())));
+        dailyItem.addActionListener(e -> menuOptionChooseAction(HistoryEnum.valueOf(e.getActionCommand())));
+//        panel.add(someButton);
         panel.validate();
         panel.setVisible(true);
         pack();
@@ -70,9 +62,13 @@ public class MainFrame extends JFrame {
             case DAILY -> dailyChart = chart;
             case HOURLY -> hourlyChart = chart;
         }
+        if (historyEnum.equals(currentEnum)) {
+            menuOptionChooseAction(historyEnum);
+        }
+        panel.revalidate();
     }
 
-    public void menuOptionChooseAction(JPanel panel, HistoryEnum historyEnum) {
+    public void menuOptionChooseAction(HistoryEnum historyEnum) {
         switch (historyEnum) {
             case MIN -> {
                 panel.add(minChart.chartPanel);
@@ -99,7 +95,25 @@ public class MainFrame extends JFrame {
                 panel.remove(minChart.chartPanel);
             }
         }
-        panel.revalidate();
+        panel.repaint();
         menuList.setText(historyEnum.toString());
+        currentEnum = historyEnum;
+    }
+
+    public void setMinChart(SampleCandlestick minChart) {
+        this.minChart = minChart;
+
+    }
+
+    public void setMin5Chart(SampleCandlestick min5Chart) {
+        this.min5Chart = min5Chart;
+    }
+
+    public void setHourlyChart(SampleCandlestick hourlyChart) {
+        this.hourlyChart = hourlyChart;
+    }
+
+    public void setDailyChart(SampleCandlestick dailyChart) {
+        this.dailyChart = dailyChart;
     }
 }

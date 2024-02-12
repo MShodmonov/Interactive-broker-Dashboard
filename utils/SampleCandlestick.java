@@ -4,13 +4,23 @@ import com.ib.client.Bar;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.SegmentedTimeline;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.xy.CandlestickRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.DefaultHighLowDataset;
+import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.RefineryUtilities;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +48,7 @@ public class SampleCandlestick {
     public ChartPanel chartPanel;
 
 
-    public SampleCandlestick(final String title, List<Bar> barList) {
+    public SampleCandlestick(final String title, List<Bar> barList, HistoryEnum historyEnum) {
         drawCandleSticks(barList);
         final JFreeChart chart = createChart(dataset);
         chart.setTitle(title);
@@ -46,15 +56,25 @@ public class SampleCandlestick {
         XYPlot plot = chart.getXYPlot();
         ValueAxis rangeAxis = plot.getRangeAxis();
         rangeAxis.setAutoRange(false);
-        rangeAxis.setRange(min.get(), max.get());
+        if (historyEnum.equals(HistoryEnum.MIN) || historyEnum.equals(HistoryEnum.MIN5)) {
+            rangeAxis.setRange(min.get(), min.get() + (max.get() - min.get()) / 30);
+        } else
+            rangeAxis.setRange(min.get(), max.get());
+        ValueAxis domainAxis = plot.getDomainAxis();
+        if (historyEnum.equals(HistoryEnum.MIN) || historyEnum.equals(HistoryEnum.MIN5) || historyEnum.equals(HistoryEnum.HOURLY)) {
+            ((DateAxis) domainAxis).setTimeline(SegmentedTimeline.newFifteenMinuteTimeline());
+        }
+
+
         final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setPreferredSize(new java.awt.Dimension(700, 400));
+        chartPanel.setMaximumDrawHeight(1000);
+        chartPanel.setMaximumDrawWidth(2000);
+        chartPanel.setPreferredSize(new java.awt.Dimension(2000, 1000));
         this.chartPanel = chartPanel;
-
-
     }
 
     private JFreeChart createChart(final DefaultHighLowDataset dataset) {
+
         final JFreeChart chart = ChartFactory.createCandlestickChart(
                 "Stock Market ES 500 FUT",
                 "Time",
@@ -65,13 +85,13 @@ public class SampleCandlestick {
         return chart;
     }
 
-    public void drawCandleSticks(List<Bar> barList){
+    public void drawCandleSticks(List<Bar> barList) {
 
-         dataset = new DefaultHighLowDataset("ES FUT", barList.stream().map(bar -> {
+        dataset = new DefaultHighLowDataset("ES FUT", barList.stream().map(bar -> {
             StringBuilder date = new StringBuilder(bar.time());
-            if (date.length() > 18){
-            date.substring(0, 17);
-            } else if (date.length() == 8){
+            if (date.length() > 18) {
+                date.substring(0, 17);
+            } else if (date.length() == 8) {
                 date.append(" 00:00:00");
             }
             try {
@@ -118,9 +138,5 @@ public class SampleCandlestick {
                 }).toArray(),
                 barList.stream().mapToDouble(bar -> bar.volume().value().doubleValue()).toArray()
         );
-//        chart = new SampleCandlestick("Candlestick Demo", dataset, min.get(), max.get());
-//        chart.pack();
-//        RefineryUtilities.centerFrameOnScreen(chart);
-//        chart.setVisible(true);
     }
 }
